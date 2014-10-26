@@ -10,11 +10,11 @@
 		02EA0C1D19FC7FCA00C773A8 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 02EA0C1C19FC7FCA00C773A8 /* main.m */; };
 		02EA0C2019FC7FCA00C773A8 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 02EA0C1F19FC7FCA00C773A8 /* AppDelegate.m */; };
 		02EA0C2319FC7FCA00C773A8 /* Instagramatic.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 02EA0C2119FC7FCA00C773A8 /* Instagramatic.xcdatamodeld */; };
-		02EA0C2619FC7FCA00C773A8 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 02EA0C2519FC7FCA00C773A8 /* ViewController.m */; };
 		02EA0C2919FC7FCA00C773A8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 02EA0C2719FC7FCA00C773A8 /* Main.storyboard */; };
 		02EA0C2B19FC7FCA00C773A8 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 02EA0C2A19FC7FCA00C773A8 /* Images.xcassets */; };
 		02EA0C2E19FC7FCA00C773A8 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 02EA0C2C19FC7FCA00C773A8 /* LaunchScreen.xib */; };
 		02EA0C3A19FC7FCA00C773A8 /* InstagramaticTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02EA0C3919FC7FCA00C773A8 /* InstagramaticTests.m */; };
+		02EA0C4519FC813100C773A8 /* InstaViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 02EA0C4419FC813100C773A8 /* InstaViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,14 +34,14 @@
 		02EA0C1E19FC7FCA00C773A8 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		02EA0C1F19FC7FCA00C773A8 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		02EA0C2219FC7FCA00C773A8 /* Instagramatic.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Instagramatic.xcdatamodel; sourceTree = "<group>"; };
-		02EA0C2419FC7FCA00C773A8 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		02EA0C2519FC7FCA00C773A8 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		02EA0C2819FC7FCA00C773A8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		02EA0C2A19FC7FCA00C773A8 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		02EA0C2D19FC7FCA00C773A8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		02EA0C3319FC7FCA00C773A8 /* InstagramaticTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = InstagramaticTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		02EA0C3819FC7FCA00C773A8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		02EA0C3919FC7FCA00C773A8 /* InstagramaticTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = InstagramaticTests.m; sourceTree = "<group>"; };
+		02EA0C4319FC813100C773A8 /* InstaViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InstaViewController.h; sourceTree = "<group>"; };
+		02EA0C4419FC813100C773A8 /* InstaViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InstaViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,8 +85,8 @@
 			children = (
 				02EA0C1E19FC7FCA00C773A8 /* AppDelegate.h */,
 				02EA0C1F19FC7FCA00C773A8 /* AppDelegate.m */,
-				02EA0C2419FC7FCA00C773A8 /* ViewController.h */,
-				02EA0C2519FC7FCA00C773A8 /* ViewController.m */,
+				02EA0C4319FC813100C773A8 /* InstaViewController.h */,
+				02EA0C4419FC813100C773A8 /* InstaViewController.m */,
 				02EA0C2719FC7FCA00C773A8 /* Main.storyboard */,
 				02EA0C2A19FC7FCA00C773A8 /* Images.xcassets */,
 				02EA0C2C19FC7FCA00C773A8 /* LaunchScreen.xib */,
@@ -224,8 +224,8 @@
 			files = (
 				02EA0C2019FC7FCA00C773A8 /* AppDelegate.m in Sources */,
 				02EA0C2319FC7FCA00C773A8 /* Instagramatic.xcdatamodeld in Sources */,
-				02EA0C2619FC7FCA00C773A8 /* ViewController.m in Sources */,
 				02EA0C1D19FC7FCA00C773A8 /* main.m in Sources */,
+				02EA0C4519FC813100C773A8 /* InstaViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

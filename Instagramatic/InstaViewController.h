@@ -1,5 +1,5 @@
 //
-//  ViewController.h
+//  InstaViewController.h
 //  Instagramatic
 //
 //  Created by Ron Barr on 10/25/14.
@@ -8,8 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ViewController : UIViewController
-
+@interface InstaViewController : UICollectionViewController
 
 @end
-
