@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		023B411919FC87C300972BE3 /* Storyboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 023B411819FC87C300972BE3 /* Storyboard.storyboard */; };
 		023B411B19FC88FA00972BE3 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 023B411A19FC88FA00972BE3 /* .gitignore */; };
+		023B411E19FC8E4D00972BE3 /* coreDataHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 023B411D19FC8E4D00972BE3 /* coreDataHelpers.m */; };
+		023B412119FC977700972BE3 /* InstagramAPIController.m in Sources */ = {isa = PBXBuildFile; fileRef = 023B412019FC977700972BE3 /* InstagramAPIController.m */; };
 		02BF9B5319FC85CF00523C71 /* InstaViewModelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 02BF9B5219FC85CF00523C71 /* InstaViewModelController.m */; };
 		02EA0C1D19FC7FCA00C773A8 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 02EA0C1C19FC7FCA00C773A8 /* main.m */; };
 		02EA0C2019FC7FCA00C773A8 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 02EA0C1F19FC7FCA00C773A8 /* AppDelegate.m */; };
@@ -32,6 +34,10 @@
 /* Begin PBXFileReference section */
 		023B411819FC87C300972BE3 /* Storyboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = Storyboard.storyboard; path = ../Storyboard.storyboard; sourceTree = "<group>"; };
 		023B411A19FC88FA00972BE3 /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = SOURCE_ROOT; };
+		023B411C19FC8E4D00972BE3 /* coreDataHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = coreDataHelpers.h; sourceTree = "<group>"; };
+		023B411D19FC8E4D00972BE3 /* coreDataHelpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = coreDataHelpers.m; sourceTree = "<group>"; };
+		023B411F19FC977700972BE3 /* InstagramAPIController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InstagramAPIController.h; sourceTree = "<group>"; };
+		023B412019FC977700972BE3 /* InstagramAPIController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InstagramAPIController.m; sourceTree = "<group>"; };
 		02BF9B5119FC85CF00523C71 /* InstaViewModelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InstaViewModelController.h; sourceTree = "<group>"; };
 		02BF9B5219FC85CF00523C71 /* InstaViewModelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InstaViewModelController.m; sourceTree = "<group>"; };
 		02BF9B5419FC861C00523C71 /* Instaview.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Instaview.pch; sourceTree = "<group>"; };
@@ -89,19 +95,21 @@
 		02EA0C1919FC7FCA00C773A8 /* Instagramatic */ = {
 			isa = PBXGroup;
 			children = (
-				023B411819FC87C300972BE3 /* Storyboard.storyboard */,
-				023B411A19FC88FA00972BE3 /* .gitignore */,
 				02EA0C1E19FC7FCA00C773A8 /* AppDelegate.h */,
 				02EA0C1F19FC7FCA00C773A8 /* AppDelegate.m */,
+				023B411C19FC8E4D00972BE3 /* coreDataHelpers.h */,
+				023B411D19FC8E4D00972BE3 /* coreDataHelpers.m */,
+				02EA0C2A19FC7FCA00C773A8 /* Images.xcassets */,
+				023B411F19FC977700972BE3 /* InstagramAPIController.h */,
+				023B412019FC977700972BE3 /* InstagramAPIController.m */,
+				02EA0C2119FC7FCA00C773A8 /* Instagramatic.xcdatamodeld */,
 				02EA0C4319FC813100C773A8 /* InstaViewController.h */,
 				02EA0C4419FC813100C773A8 /* InstaViewController.m */,
 				02BF9B5119FC85CF00523C71 /* InstaViewModelController.h */,
 				02BF9B5219FC85CF00523C71 /* InstaViewModelController.m */,
-				02EA0C2A19FC7FCA00C773A8 /* Images.xcassets */,
 				02EA0C2C19FC7FCA00C773A8 /* LaunchScreen.xib */,
-				02EA0C2119FC7FCA00C773A8 /* Instagramatic.xcdatamodeld */,
+				023B411819FC87C300972BE3 /* Storyboard.storyboard */,
 				02EA0C1A19FC7FCA00C773A8 /* Supporting Files */,
-				02BF9B5419FC861C00523C71 /* Instaview.pch */,
 			);
 			path = Instagramatic;
 			sourceTree = "<group>";
@@ -109,6 +117,8 @@
 		02EA0C1A19FC7FCA00C773A8 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				02BF9B5419FC861C00523C71 /* Instaview.pch */,
+				023B411A19FC88FA00972BE3 /* .gitignore */,
 				02EA0C1B19FC7FCA00C773A8 /* Info.plist */,
 				02EA0C1C19FC7FCA00C773A8 /* main.m */,
 			);
@@ -234,6 +244,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				023B411E19FC8E4D00972BE3 /* coreDataHelpers.m in Sources */,
+				023B412119FC977700972BE3 /* InstagramAPIController.m in Sources */,
 				02EA0C2019FC7FCA00C773A8 /* AppDelegate.m in Sources */,
 				02EA0C2319FC7FCA00C773A8 /* Instagramatic.xcdatamodeld in Sources */,
 				02EA0C1D19FC7FCA00C773A8 /* main.m in Sources */,

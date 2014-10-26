@@ -7,8 +7,11 @@
 //
 
 #import "InstaViewController.h"
+#import "InstaViewModelController.h"
 
 @interface InstaViewController ()
+
+@property (strong,nonatomic) InstaViewModelController * modelController;
 
 @end
 
@@ -16,7 +19,9 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+    self.modelController = [[InstaViewModelController alloc] init];
+    self.collectionView.delegate = self.modelController;
+    self.collectionView.dataSource = self.modelController;
 }
 
 - (void)didReceiveMemoryWarning {

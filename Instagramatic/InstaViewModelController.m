@@ -7,7 +7,24 @@
 //
 
 #import "InstaViewModelController.h"
+#import "InstagramAPIController.h"
+
+@interface InstaViewModelController ()
+
+@property (strong, nonatomic) InstagramAPIController * APIController;
+
+@end
 
 @implementation InstaViewModelController
+
+-(instancetype) init {
+    {
+        if (self = [super init])
+        {
+           
+        }
+        return self;
+    }
+}
 
 @end
