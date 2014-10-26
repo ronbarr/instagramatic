@@ -6,6 +6,8 @@
 //  Copyright (c) 2014 Ron Barr. All rights reserved.
 //
 
-@interface InstaViewModelController : NSObject <UICollectionViewDelegate, UICollectionViewDataSource>
+@interface InstaViewModelController : NSObject <UICollectionViewDelegate, UICollectionViewDataSource,NSFetchedResultsControllerDelegate>
+
+@property (strong, nonatomic) UICollectionView * collectionView;
 
 @end

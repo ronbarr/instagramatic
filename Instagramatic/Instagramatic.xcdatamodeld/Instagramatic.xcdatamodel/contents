@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="6252" systemVersion="14A388a" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
-    <entity name="Image" representedClassName="Image" syncable="YES">
-        <attribute name="caption" optional="YES" attributeType="String" syncable="YES"/>
+    <entity name="Image" representedClassName="" syncable="YES">
         <attribute name="created" optional="YES" attributeType="Date" syncable="YES"/>
-        <attribute name="downloadData" optional="YES" attributeType="Date" syncable="YES"/>
-        <attribute name="filter" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="instaID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="fullName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="instaID" attributeType="String" indexed="YES" syncable="YES"/>
         <attribute name="link" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="location" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="tags" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="loResURL" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="standardURL" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="thumbURL" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="type" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="user" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="users" optional="YES" attributeType="String" syncable="YES"/>
-        <relationship name="largeImage" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ImageData" inverseName="largeImageInfo" inverseEntity="ImageData" syncable="YES"/>
-        <relationship name="profileImage" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ImageData" inverseName="profileImageInfo" inverseEntity="ImageData" syncable="YES"/>
+        <attribute name="updated" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="userID" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="userName" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="smallImage" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ImageData" inverseName="smallImageInfo" inverseEntity="ImageData" syncable="YES"/>
+        <relationship name="stdImage" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ImageData" inverseName="stdImageInfo" inverseEntity="ImageData" syncable="YES"/>
+        <relationship name="thumbImage" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ImageData" inverseName="thumbImageInfo" inverseEntity="ImageData" syncable="YES"/>
     </entity>
-    <entity name="ImageData" representedClassName="ImageData" syncable="YES">
+    <entity name="ImageData" representedClassName="" syncable="YES">
         <attribute name="imageBinaryData" optional="YES" attributeType="Binary" syncable="YES"/>
-        <relationship name="largeImageInfo" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Image" inverseName="largeImage" inverseEntity="Image" syncable="YES"/>
-        <relationship name="profileImageInfo" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Image" inverseName="profileImage" inverseEntity="Image" syncable="YES"/>
         <relationship name="smallImageInfo" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Image" inverseName="smallImage" inverseEntity="Image" syncable="YES"/>
+        <relationship name="stdImageInfo" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Image" inverseName="stdImage" inverseEntity="Image" syncable="YES"/>
+        <relationship name="thumbImageInfo" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Image" inverseName="thumbImage" inverseEntity="Image" syncable="YES"/>
     </entity>
     <elements>
         <element name="Image" positionX="-63" positionY="-18" width="128" height="253"/>

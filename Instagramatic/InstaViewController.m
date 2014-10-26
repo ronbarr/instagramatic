@@ -20,6 +20,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.modelController = [[InstaViewModelController alloc] init];
+    self.modelController.collectionView = self.collectionView;
     self.collectionView.delegate = self.modelController;
     self.collectionView.dataSource = self.modelController;
 }

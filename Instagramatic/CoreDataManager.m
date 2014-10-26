@@ -6,10 +6,10 @@
 //  Copyright (c) 2014 Ron Barr. All rights reserved.
 //
 
-#import "coreDataHelpers.h"
+#import "CoreDataManager.h"
 #import "AppDelegate.h"
 
-@implementation coreDataHelpers
+@implementation CoreDataManager
 #pragma mark - Core Data stack
 
 @synthesize rootObjectContext = _rootObjectContext;
@@ -18,14 +18,14 @@
 @synthesize managedObjectModel = _managedObjectModel;
 @synthesize persistentStoreCoordinator = _persistentStoreCoordinator;
 
-+ (coreDataHelpers *)sharedHelpers
++ (instancetype)sharedManager
 {
-    static coreDataHelpers *sharedHelpers = nil;
+    static CoreDataManager *sharedManager = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        sharedHelpers = [[coreDataHelpers alloc] init];
+        sharedManager = [[CoreDataManager alloc] init];
     });
-    return sharedHelpers;
+    return sharedManager;
 }
 
 -(instancetype) init {
@@ -33,7 +33,7 @@
         if (self = [super init])
         {
             
-        }
+          }
         return self;
     }
 }
@@ -72,7 +72,7 @@
         // Replace this with code to handle the error appropriately.
         // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
         NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-        abort();
+
     }
     
     return _persistentStoreCoordinator;
@@ -90,8 +90,11 @@
         return nil;
     }
     _mainObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
-    [_mainObjectContext setPersistentStoreCoordinator:coordinator];
-    return _mainObjectContext;
+    [_mainObjectContext setParentContext:[self rootObjectContext]];
+    if (!_mainObjectContext.persistentStoreCoordinator) {
+        [_mainObjectContext setPersistentStoreCoordinator:coordinator];
+    }
+     return _mainObjectContext;
 }
 
 - (NSManagedObjectContext *)rootObjectContext {
@@ -105,20 +108,25 @@
         return nil;
     }
     _rootObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
-    [_rootObjectContext setPersistentStoreCoordinator:coordinator];
+    if (!_rootObjectContext.persistentStoreCoordinator) {
+        [_rootObjectContext setPersistentStoreCoordinator:coordinator];
+    }
     return _rootObjectContext;
 }
 
 #pragma mark - Core Data Saving support
 
-- (void)saveContext {
+- (void)saveContext:(NSManagedObjectContext *) context {
+    /** recursively save contexts through to the root **/
     BOOL success = YES;
-    NSManagedObjectContext *managedObjectContext = self.rootObjectContext;
-    if (managedObjectContext != nil) {
+    if (context != nil) {
         NSError *error = nil;
-         if ([managedObjectContext hasChanges]) {
-            if ([managedObjectContext save:&error]) {
+         if ([context hasChanges]) {
+            if ([context save:&error]) {
                 NSLog(@"saved objects");
+                if (context.parentContext) {
+                    [self saveContext:context.parentContext];
+                }
             }
             else {
                 success = NO;
@@ -133,7 +141,10 @@
 #pragma mark - Create new local context for use in background threads
     - (NSManagedObjectContext *)localContext {
         NSManagedObjectContext *temporaryContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
-        temporaryContext.parentContext = _mainObjectContext;
+        [temporaryContext setParentContext:[self mainObjectContext]];
+        if (!temporaryContext.persistentStoreCoordinator) {
+            [temporaryContext setPersistentStoreCoordinator:[self persistentStoreCoordinator]];
+        }
         return temporaryContext;
     }
     

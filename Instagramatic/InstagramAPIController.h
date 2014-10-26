@@ -10,4 +10,14 @@
 
 @interface InstagramAPIController : NSObject < NSURLConnectionDelegate, NSURLConnectionDataDelegate>
 
+typedef NS_ENUM(NSInteger, imageSize) {
+    standard,
+    loRes,
+    thumbnail
+};
+
+-(void)downloadImageAtURL:(NSString *)imageURLString
+               forImageID:(NSString *)imageID
+                     size:(imageSize)size;
+
 @end
