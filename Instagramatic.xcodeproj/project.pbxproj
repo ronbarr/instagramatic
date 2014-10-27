@@ -42,6 +42,7 @@
 		023B412219FCA69500972BE3 /* MainStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainStoryboard.storyboard; sourceTree = "<group>"; };
 		023B412D19FCF05100972BE3 /* CollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CollectionViewCell.h; sourceTree = "<group>"; };
 		023B412E19FCF05100972BE3 /* CollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CollectionViewCell.m; sourceTree = "<group>"; };
+		02660AF019FEDB08004079F0 /* Instagramatic 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Instagramatic 2.xcdatamodel"; sourceTree = "<group>"; };
 		02B6394B19FE1E59001EF0FD /* InstaViewModelControllerDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InstaViewModelControllerDelegate.h; sourceTree = "<group>"; };
 		02B6394C19FE208F001EF0FD /* DetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetailViewController.h; sourceTree = "<group>"; };
 		02B6394D19FE208F001EF0FD /* DetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetailViewController.m; sourceTree = "<group>"; };
@@ -94,8 +95,11 @@
 		023B412619FCB46300972BE3 /* Instagram */ = {
 			isa = PBXGroup;
 			children = (
+				02B6394B19FE1E59001EF0FD /* InstaViewModelControllerDelegate.h */,
 				023B411F19FC977700972BE3 /* InstagramAPIController.h */,
 				023B412019FC977700972BE3 /* InstagramAPIController.m */,
+				02BF9B5219FC85CF00523C71 /* InstaViewModelController.m */,
+				02BF9B5119FC85CF00523C71 /* InstaViewModelController.h */,
 			);
 			name = Instagram;
 			sourceTree = "<group>";
@@ -121,22 +125,18 @@
 		02EA0C1919FC7FCA00C773A8 /* Instagramatic */ = {
 			isa = PBXGroup;
 			children = (
+				023B412219FCA69500972BE3 /* MainStoryboard.storyboard */,
 				02EA0C1E19FC7FCA00C773A8 /* AppDelegate.h */,
 				02EA0C1F19FC7FCA00C773A8 /* AppDelegate.m */,
-				023B412219FCA69500972BE3 /* MainStoryboard.storyboard */,
+				023B412D19FCF05100972BE3 /* CollectionViewCell.h */,
+				023B412E19FCF05100972BE3 /* CollectionViewCell.m */,
 				023B412419FCB43900972BE3 /* Core Data */,
+				02B6394C19FE208F001EF0FD /* DetailViewController.h */,
+				02B6394D19FE208F001EF0FD /* DetailViewController.m */,
 				02EA0C2A19FC7FCA00C773A8 /* Images.xcassets */,
 				023B412619FCB46300972BE3 /* Instagram */,
 				02EA0C4319FC813100C773A8 /* InstaViewController.h */,
 				02EA0C4419FC813100C773A8 /* InstaViewController.m */,
-				02B6394C19FE208F001EF0FD /* DetailViewController.h */,
-				02B6394D19FE208F001EF0FD /* DetailViewController.m */,
-				02B6394B19FE1E59001EF0FD /* InstaViewModelControllerDelegate.h */,
-				02BF9B5119FC85CF00523C71 /* InstaViewModelController.h */,
-				02BF9B5219FC85CF00523C71 /* InstaViewModelController.m */,
-				023B412D19FCF05100972BE3 /* CollectionViewCell.h */,
-				023B412E19FCF05100972BE3 /* CollectionViewCell.m */,
-				02EA0C2C19FC7FCA00C773A8 /* LaunchScreen.xib */,
 				02EA0C1A19FC7FCA00C773A8 /* Supporting Files */,
 			);
 			path = Instagramatic;
@@ -145,6 +145,7 @@
 		02EA0C1A19FC7FCA00C773A8 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				02EA0C2C19FC7FCA00C773A8 /* LaunchScreen.xib */,
 				02BF9B5419FC861C00523C71 /* Instaview.pch */,
 				023B411A19FC88FA00972BE3 /* .gitignore */,
 				02EA0C1B19FC7FCA00C773A8 /* Info.plist */,
@@ -486,9 +487,10 @@
 		02EA0C2119FC7FCA00C773A8 /* Instagramatic.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				02660AF019FEDB08004079F0 /* Instagramatic 2.xcdatamodel */,
 				02EA0C2219FC7FCA00C773A8 /* Instagramatic.xcdatamodel */,
 			);
-			currentVersion = 02EA0C2219FC7FCA00C773A8 /* Instagramatic.xcdatamodel */;
+			currentVersion = 02660AF019FEDB08004079F0 /* Instagramatic 2.xcdatamodel */;
 			path = Instagramatic.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

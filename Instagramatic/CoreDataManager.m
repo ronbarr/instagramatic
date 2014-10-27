@@ -69,8 +69,6 @@
         dict[NSLocalizedFailureReasonErrorKey] = failureReason;
         dict[NSUnderlyingErrorKey] = error;
         error = [NSError errorWithDomain:@"YOUR_ERROR_DOMAIN" code:9999 userInfo:dict];
-        // Replace this with code to handle the error appropriately.
-        // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
         NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
 
     }
@@ -121,19 +119,11 @@
 - (void)saveContext:(NSManagedObjectContext *) context {
     /** recursively save contexts through to the root **/
     BOOL success = YES;
-    if (context == self.rootObjectContext) {
-        NSLog(@"will save root");
-    } else
-        if (context == self.mainObjectContext) {
-            NSLog(@"will save main");
-        } else {
-            NSLog(@"will save context %@", context);
-        }
-    if (context != nil) {
+     if (context != nil) {
         NSError *error = nil;
          if ([context hasChanges]) {
             if ([context save:&error]) {
-                NSLog(@"saved %@", context);
+      
                 if (context.parentContext) {
                     [self saveContext:context.parentContext];
                 }

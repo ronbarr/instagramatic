@@ -10,5 +10,7 @@
 
 @interface DetailViewController : UIViewController
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
+@property (strong, nonatomic)  UIImage *imageToShow;
+- (IBAction)dismiss:(id)sender;
 
 @end

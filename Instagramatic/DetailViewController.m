@@ -16,14 +16,18 @@
 
 -(void) viewDidLoad {
     [super viewDidLoad];
-    UITapGestureRecognizer * tapRecognizer = [[UITapGestureRecognizer alloc]
-                                              initWithTarget:self.imageView
-                                              action:@selector(imageTapped)];
-    [tapRecognizer setNumberOfTapsRequired:1];
-    [self.imageView addGestureRecognizer:tapRecognizer];
+ 
+    self.imageView.image = self.imageToShow;
 }
 
--(void) imageTapped {
+- (IBAction)dismiss:(id)sender {
     [self dismissViewControllerAnimated:YES completion:nil];
+
+}
+
+- (BOOL)prefersStatusBarHidden
+/** tell the system to hide the status bar */
+{
+    return YES;
 }
 @end

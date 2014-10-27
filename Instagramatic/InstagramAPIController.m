@@ -65,9 +65,10 @@
         self.secret = @"6f17e1ac069a4abdad2f131fbb0bfa2f";
         self.delayBetweenRetrievals = 20;
         self.photoCacheSize = 100;
+        [self pruneDataBase:120];
          
         //Update frequently
-        self.fetchTimer = [NSTimer timerWithTimeInterval:self.delayBetweenRetrievals
+        self.fetchTimer = [NSTimer scheduledTimerWithTimeInterval:self.delayBetweenRetrievals
                                                   target:self
                                                 selector:@selector(fetchMorePhotos)
                                                 userInfo:nil
@@ -90,7 +91,6 @@
     }
     NSURL * requestURL = [NSURL URLWithString:requestString];
     NSURLRequest * request = [NSURLRequest requestWithURL:requestURL];
-    NSLog(@"request %@", request);
     
     //Start connection
     self.imageInfoConnection = nil;
@@ -108,6 +108,27 @@
     NSLog(@"refreshing...");
 }
 
+-(void) pruneDataBase:(NSInteger) maxImages {
+    NSManagedObjectContext * context = [[CoreDataManager sharedManager] localContext];
+    
+    NSEntityDescription *entityDescription = [NSEntityDescription
+                                              entityForName:@"Image" inManagedObjectContext:context];
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+    [request setEntity:entityDescription];
+    
+    NSError *error;
+    NSArray *array = [context executeFetchRequest:request error:&error];
+    if (array.count > maxImages) {
+        NSSortDescriptor * descriptor = [NSSortDescriptor sortDescriptorWithKey:@"updated" ascending:YES];
+        array = [array sortedArrayUsingDescriptors:@[descriptor]];
+        array = [array subarrayWithRange:NSMakeRange(0, array.count - maxImages)];
+        for (NSManagedObject * image in array) {
+            [context deleteObject:image];
+        }
+        [[CoreDataManager sharedManager] saveContext:context];
+    }
+}
+
 #pragma mark - parse and store incoming data
 -(void) parseIncomingData:(NSData *) data {
     /** Parses incoming data asynchronously **/
@@ -123,7 +144,7 @@
         }
         else {
             [self storeJSONRecords:JSONData inContext:localContext];
-            NSLog(@"saving incoming records %@",localContext);
+    
             [coreDataManager saveContext:localContext];
         }
         
@@ -224,13 +245,6 @@
     [self updateAttribute:@"loResURL" ofImage:imageInfo withValue:loResURL];
     [self updateAttribute:@"thumbURL" ofImage:imageInfo withValue:thumbURL];
     
-    //Start the downloading of the images themselves
-    //    NSString * imageID = [imageValues objectForKey:@"id"];
-    //    [self downloadImageAtURL:stdImageURL forImageID:imageID size:standard];
-    //    [self downloadImageAtURL:loResURL forImageID:imageID size:loRes];
-    //    [self downloadImageAtURL:thumbURL forImageID:imageID size:thumbnail];
-    //
-    //Get the user info
     NSDictionary * userInfo = [imageValues objectForKey:@"user"];
     [self updateAttribute:@"userName" ofImage:imageInfo withValue:[userInfo objectForKey:@"username"]];
     [self updateAttribute:@"fullName" ofImage:imageInfo withValue:[userInfo objectForKey:@"full)name"]];
@@ -284,13 +298,13 @@
                                                optionalReturnImageView.image = [UIImage imageWithData:data];
                                            }
                                            
-                                           NSLog(@"saving incoming image %@",localContext);
+                      
                                            [coreDataManager saveContext:localContext];
                                        }];
                                        
                                        //Fire it up
                                        [self.backgroundReadingQueue addOperation:transformImageOperation];
-                                       NSLog(@"adding transformation count %lu", (unsigned long)self.backgroundReadingQueue.operationCount);
+      
                                        
                                    }
                                }];
