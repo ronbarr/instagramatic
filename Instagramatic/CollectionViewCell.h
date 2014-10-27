@@ -10,5 +10,5 @@
 
 @interface CollectionViewCell : UICollectionViewCell
 @property (weak, nonatomic) IBOutlet UIImageView *image;
-
+@property (strong, nonatomic) NSString * imageID;
 @end

@@ -7,7 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "InstaViewModelControllerDelegate.h"
 
-@interface InstaViewController : UICollectionViewController
+@interface InstaViewController : UICollectionViewController <InstaViewModelControllerDelegate,
+                                                                UIPopoverControllerDelegate>
 
 @end

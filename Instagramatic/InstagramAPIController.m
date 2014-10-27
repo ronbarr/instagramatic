@@ -35,6 +35,7 @@
 @property (strong,nonatomic) NSURLConnection * imageInfoConnection;
 @property (strong,nonatomic) NSURLConnection * imageDownloadConnection;
 
+//Queues for reading and processing
 @property (strong,nonatomic) NSOperationQueue * backgroundReadingQueue;
 
 //Incoming data
@@ -45,23 +46,33 @@
 @implementation InstagramAPIController
 
 #pragma mark init
+
++ (instancetype)sharedController
+{
+    static InstagramAPIController *sharedController = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedController = [[InstagramAPIController alloc] init];
+    });
+    return sharedController;
+}
+
 -(instancetype) init {
     if (self = [super init]) {
         //Set parameters
         self.tag = @"selfie";
         self.accessToken = @"87b8196ae610451b98d8c0816634cd0e";
         self.secret = @"6f17e1ac069a4abdad2f131fbb0bfa2f";
-        self.delayBetweenRetrievals = 300;
+        self.delayBetweenRetrievals = 20;
         self.photoCacheSize = 100;
-        [self retrievePhotos:self.tag sinceID:0];
-        
+         
         //Update frequently
         self.fetchTimer = [NSTimer timerWithTimeInterval:self.delayBetweenRetrievals
                                                   target:self
                                                 selector:@selector(fetchMorePhotos)
                                                 userInfo:nil
                                                  repeats:YES];
-        
+        [self.fetchTimer fire];
         self.backgroundReadingQueue = [[NSOperationQueue alloc] init];
         self.backgroundReadingQueue.maxConcurrentOperationCount = 1;
     }
@@ -94,7 +105,9 @@
 
 -(void) fetchMorePhotos {
     [self retrievePhotos:self.tag sinceID:[self.lastID longLongValue]];
+    NSLog(@"refreshing...");
 }
+
 #pragma mark - parse and store incoming data
 -(void) parseIncomingData:(NSData *) data {
     /** Parses incoming data asynchronously **/
@@ -106,17 +119,18 @@
         NSError * error;
         NSDictionary * JSONData = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
         if (error) {
-            NSLog(@"fatal error %@ %lu", error, error.code);
+            NSLog(@"fatal error %@ %lu", error, (long)error.code);
         }
         else {
             [self storeJSONRecords:JSONData inContext:localContext];
+            NSLog(@"saving incoming records %@",localContext);
             [coreDataManager saveContext:localContext];
         }
         
     }];
 }
 
-#pragma mark get array of JSON record from blob
+#pragma mark get array of JSON records from blob
 -(void) storeJSONRecords:(NSDictionary *) JSONData
                inContext:(NSManagedObjectContext *) context {
     NSArray * data = [JSONData objectForKey:@"data"];
@@ -137,14 +151,14 @@
     [request setEntity:entityDescription];
     
     //Valid record?
-         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"instaID = %@", imageID];
-        [request setPredicate:predicate];
-        
-        NSError *error;
-        NSArray *array = [context executeFetchRequest:request error:&error];
-        if (array.count) {
-            fetchedObject = [array firstObject];
-        }
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"instaID = %@", imageID];
+    [request setPredicate:predicate];
+    
+    NSError *error;
+    NSArray *array = [context executeFetchRequest:request error:&error];
+    if (array.count) {
+        fetchedObject = [array firstObject];
+    }
     return fetchedObject;
 }
 
@@ -173,28 +187,28 @@
     }
 }
 
-#pragma mark create a new image record
+#pragma mark create a new image info record
 -(void) createRecord:(NSDictionary *) imageValues
            inContext:(NSManagedObjectContext *) context {
-    NSManagedObject * newRecord = [NSEntityDescription insertNewObjectForEntityForName:@"Image"
+    NSManagedObject * imageInfo = [NSEntityDescription insertNewObjectForEntityForName:@"Image"
                                                                 inManagedObjectContext:context];
-    [newRecord setValue:[NSDate date] forKey:@"created"];
-    [self updateRecord:newRecord
+    [imageInfo setValue:[NSDate date] forKey:@"created"];
+    [self updateRecord:imageInfo
             withValues:imageValues
              inContext:context];
 }
 
 #pragma mark update record with new values
--(void) updateRecord:(NSManagedObject *)image
+-(void) updateRecord:(NSManagedObject *)imageInfo
           withValues: (NSDictionary *) imageValues
            inContext:(NSManagedObjectContext *) context {
     
-    [image setValue:[NSDate date] forKey:@"updated"];
+    [imageInfo setValue:[NSDate date] forKey:@"updated"];
     
     //First get standard info
-    [self updateAttribute:@"instaID" ofImage:image withValue:[imageValues objectForKey:@"id"]];
-    [self updateAttribute:@"type" ofImage:image withValue:[imageValues objectForKey:@"type"]];
-    [self updateAttribute:@"link" ofImage:image withValue:[imageValues objectForKey:@"link"]];
+    [self updateAttribute:@"instaID" ofImage:imageInfo withValue:[imageValues objectForKey:@"id"]];
+    [self updateAttribute:@"type" ofImage:imageInfo withValue:[imageValues objectForKey:@"type"]];
+    [self updateAttribute:@"link" ofImage:imageInfo withValue:[imageValues objectForKey:@"link"]];
     
     //Extract the image URLS
     NSDictionary * images = [imageValues objectForKey:@"images"];
@@ -206,63 +220,86 @@
     NSString * loResURL = [loResImage valueForKey:@"url"];
     NSString * thumbURL = [thumbNail valueForKey:@"url"];
     
-    [self updateAttribute:@"standardURL" ofImage:image withValue:stdImageURL];
-    [self updateAttribute:@"loResURL" ofImage:image withValue:loResURL];
-    [self updateAttribute:@"thumbURL" ofImage:image withValue:thumbURL];
+    [self updateAttribute:@"standardURL" ofImage:imageInfo withValue:stdImageURL];
+    [self updateAttribute:@"loResURL" ofImage:imageInfo withValue:loResURL];
+    [self updateAttribute:@"thumbURL" ofImage:imageInfo withValue:thumbURL];
     
     //Start the downloading of the images themselves
-    NSString * imageID = [imageValues objectForKey:@"id"];
-    [self downloadImageAtURL:stdImageURL forImageID:imageID size:standard];
-    [self downloadImageAtURL:loResURL forImageID:imageID size:loRes];
-    [self downloadImageAtURL:thumbURL forImageID:imageID size:thumbnail];
-    
+    //    NSString * imageID = [imageValues objectForKey:@"id"];
+    //    [self downloadImageAtURL:stdImageURL forImageID:imageID size:standard];
+    //    [self downloadImageAtURL:loResURL forImageID:imageID size:loRes];
+    //    [self downloadImageAtURL:thumbURL forImageID:imageID size:thumbnail];
+    //
     //Get the user info
     NSDictionary * userInfo = [imageValues objectForKey:@"user"];
-    [self updateAttribute:@"userName" ofImage:image withValue:[userInfo objectForKey:@"username"]];
-    [self updateAttribute:@"fullName" ofImage:image withValue:[userInfo objectForKey:@"full)name"]];
-    [self updateAttribute:@"userID" ofImage:image withValue:[userInfo objectForKey:@"id"]];
+    [self updateAttribute:@"userName" ofImage:imageInfo withValue:[userInfo objectForKey:@"username"]];
+    [self updateAttribute:@"fullName" ofImage:imageInfo withValue:[userInfo objectForKey:@"full)name"]];
+    [self updateAttribute:@"userID" ofImage:imageInfo withValue:[userInfo objectForKey:@"id"]];
     
 }
 
 
 -(void)downloadImageAtURL:(NSString *)imageURLString
                forImageID:(NSString *)imageID
-                     size:(imageSize)size {
-    
+                     size:(imageSize)size
+                  onqueue:(NSOperationQueue *) optionalQueue
+              returnImage:(UIImageView *) optionalReturnImageView
+{
     if (imageURLString.length) {
-    
-    NSURL * imageURL = [NSURL URLWithString:imageURLString];
-    
-    [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:imageURL]
-                                       queue:self.backgroundReadingQueue
-                           completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
-                               if (!error) {
-                                   CoreDataManager * coreDataManager = [CoreDataManager sharedManager];
-                                   NSManagedObjectContext * localContext = [coreDataManager localContext];
-                                   [localContext performBlock:^{
-                                       /*Got the image data. Fetch the original image info, create a new record
-                                        with the image data, and point to it from the original info record */
-                                       NSManagedObject * imageInfo = [self imageFromID:imageID
-                                                                             inContext:localContext];
+        
+        NSURL * imageURL = [NSURL URLWithString:imageURLString];
+        
+        NSOperationQueue * queue = self.backgroundReadingQueue;
+        if (optionalQueue) {
+            queue = optionalQueue;
+        }
+        
+        [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:imageURL]
+                                           queue:queue
+                               completionHandler: ^(NSURLResponse *response, NSData *data, NSError *error) {
+                                   if (!error) {
+                                       NSBlockOperation * transformImageOperation = [NSBlockOperation blockOperationWithBlock:^{
+                                           /*Got the image data. Fetch the original image info, create a new record
+                                            with the image data, and point to it from the original info record */
+                                           CoreDataManager * coreDataManager = [CoreDataManager sharedManager];
+                                           NSManagedObjectContext * localContext = [coreDataManager localContext];
+                                           NSManagedObject * imageInfo = [self imageFromID:imageID
+                                                                                 inContext:localContext];
+                                           
+                                           NSManagedObject * imagedata = [NSEntityDescription insertNewObjectForEntityForName:@"ImageData"
+                                                                                                       inManagedObjectContext:localContext];
+                                          [imagedata setValue:data forKey:@"imageBinaryData"];
+                                           
+                                           NSString * key = @"stdImage";
+                                           if (size == loRes) {
+                                               key = @"smallImage";
+                                           }
+                                           else if (size == thumbnail) {
+                                               key = @"thumbImage";
+                                           }
+                                           [imageInfo setValue:[NSDate date] forKey:@"updated"];
+                                           [imageInfo setValue:imagedata forKey:key];
+                                           
+                                           if (optionalReturnImageView) {
+                                               optionalReturnImageView.image = [UIImage imageWithData:data];
+                                           }
+                                           
+                                           NSLog(@"saving incoming image %@",localContext);
+                                           [coreDataManager saveContext:localContext];
+                                       }];
                                        
-                                       NSManagedObject * newRecord = [NSEntityDescription insertNewObjectForEntityForName:@"ImageData"
-                                                    inManagedObjectContext:localContext];
-                                       [newRecord setValue:data forKey:@"imageBinaryData"];
+                                       //Fire it up
+                                       [self.backgroundReadingQueue addOperation:transformImageOperation];
+                                       NSLog(@"adding transformation count %lu", (unsigned long)self.backgroundReadingQueue.operationCount);
                                        
-                                       NSString * key = @"stdImage";
-                                       if (size == loRes) {
-                                           key = @"smallImage";
-                                       }
-                                       else if (size == thumbnail) {
-                                           key = @"thumbImage";
-                                       }
-                                       [imageInfo setValue:newRecord forKey:key];
-                                       
-                                   }];
-                                   [coreDataManager saveContext:localContext];
-                               }
-                           }];
+                                   }
+                               }];
     }
+}
+
+-(void) transformIncomingImageFromID:(NSString *) imageID
+                            withData:(NSData *) data
+                                size:(imageSize) size {
 }
 
 -(void) updateAttribute:(NSString *) attribute
@@ -302,6 +339,6 @@
 }
 
 -(void) connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-    NSLog(@"fatal error %@ %lu", error, error.code);
+    NSLog(@"fatal error %@ %lu", error, (long)error.code);
 }
 @end

@@ -94,6 +94,7 @@
     if (!_mainObjectContext.persistentStoreCoordinator) {
         [_mainObjectContext setPersistentStoreCoordinator:coordinator];
     }
+    [_mainObjectContext setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
      return _mainObjectContext;
 }
 
@@ -111,6 +112,7 @@
     if (!_rootObjectContext.persistentStoreCoordinator) {
         [_rootObjectContext setPersistentStoreCoordinator:coordinator];
     }
+    [_rootObjectContext setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
     return _rootObjectContext;
 }
 
@@ -119,15 +121,23 @@
 - (void)saveContext:(NSManagedObjectContext *) context {
     /** recursively save contexts through to the root **/
     BOOL success = YES;
+    if (context == self.rootObjectContext) {
+        NSLog(@"will save root");
+    } else
+        if (context == self.mainObjectContext) {
+            NSLog(@"will save main");
+        } else {
+            NSLog(@"will save context %@", context);
+        }
     if (context != nil) {
         NSError *error = nil;
          if ([context hasChanges]) {
             if ([context save:&error]) {
-                NSLog(@"saved objects");
+                NSLog(@"saved %@", context);
                 if (context.parentContext) {
                     [self saveContext:context.parentContext];
                 }
-            }
+             }
             else {
                 success = NO;
                 NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
@@ -145,6 +155,7 @@
         if (!temporaryContext.persistentStoreCoordinator) {
             [temporaryContext setPersistentStoreCoordinator:[self persistentStoreCoordinator]];
         }
+        [temporaryContext setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
         return temporaryContext;
     }
     

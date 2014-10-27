@@ -29,7 +29,7 @@
 -(instancetype) init {
     if (self = [super init]) {
         //Create the API controller and start connection
-        self.APIController = [[InstagramAPIController alloc] init];
+        self.APIController = [InstagramAPIController sharedController];
         
         //Initialize the fetched results controller
         [[[self fetchedResultsController] managedObjectContext] performBlock:^{
@@ -43,6 +43,9 @@
                 }];
             }
         }];
+        _objectChanges = [NSMutableArray arrayWithCapacity:100];
+        _sectionChanges = [NSMutableArray arrayWithCapacity:100];
+        
     }
     return self;
 }
@@ -59,7 +62,7 @@
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     // Edit the entity name as appropriate.
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Image"
-                                              inManagedObjectContext:[coreDataManager mainObjectContext]];
+                                              inManagedObjectContext:[coreDataManager rootObjectContext]];
     [fetchRequest setEntity:entity];
     
     //We're getting all records; no need to set a predicate
@@ -79,7 +82,7 @@
     //Creating a new local context for the fetched results controller. Now all delegate functions will happen in background
     NSFetchedResultsController *aFetchedResultsController =
     [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
-                                        managedObjectContext:[coreDataManager localContext]
+                                        managedObjectContext:[coreDataManager rootObjectContext]
                                           sectionNameKeyPath:sectionPath
                                                    cacheName:nil];
     aFetchedResultsController.delegate = self;
@@ -123,6 +126,7 @@
      forChangeType:(NSFetchedResultsChangeType)type
       newIndexPath:(NSIndexPath *)newIndexPath
 {
+    NSLog(@"change is incoming... %i",type);
     
     NSMutableDictionary *change = [NSMutableDictionary new];
     switch(type)
@@ -140,16 +144,25 @@
             change[@(type)] = @[indexPath, newIndexPath];
             break;
     }
-    [_objectChanges addObject:change];
+    
+     [_objectChanges addObject:change];
+    if (_objectChanges.count >= 10) {
+        [_objectChanges removeAllObjects];
+        self.fetchedResultsController = nil;
+        [self.collectionView reloadData];
+        NSLog(@"reloading...");
+    }
 }
 
 - (void)controllerDidChangeContent:(NSFetchedResultsController *)controller
 {
-    if ([_sectionChanges count] > 0)
+    
+    if ([_sectionChanges count] > 0 )
     {
         //UI operations - switch back to main thread
         
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+          [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+              
             [self.collectionView performBatchUpdates:^{
                 
                 for (NSDictionary *change in _sectionChanges)
@@ -218,12 +231,12 @@
                     } completion:nil];
                 }
             }
+            [_sectionChanges removeAllObjects];
+            [_objectChanges removeAllObjects];
         }];
         
         //Back in the background...
-        [_sectionChanges removeAllObjects];
-        [_objectChanges removeAllObjects];
-    }
+     }
 }
 
 - (BOOL)shouldReloadCollectionViewToPreventKnownIssue {
@@ -260,48 +273,140 @@
     return shouldReload;
 }
 
-#pragma mark - Collection View Data Source
+#pragma mark - Collection View Data Source & delegate
 -(NSInteger) collectionView:(UICollectionView *)collectionView
      numberOfItemsInSection:(NSInteger)section {
     NSUInteger objectCount = self.fetchedResultsController.fetchedObjects.count;
-
+    
+    NSLog(@"%lu objects in section", objectCount);
     return objectCount;
-}
-
--(BOOL) shouldBeLargeImage:(NSIndexPath *) indexPath {
- /* Every third item starting with the first should be large. */
-  return indexPath.row % 3 == 1;
 }
 
 -(UICollectionViewCell *) collectionView:(UICollectionView *)collectionView
                   cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     
-    NSString * cellIdentifier = @"smallImageCell";
-    NSString * imageIdentifier = @"smallImage";
-    NSString * imageURL = @"loResURL";
-    imageSize size = loRes;
+    //Should this be a large image?
+    imageSize size = [self shouldBeLargeImage:indexPath] ? standard : loRes;
     
-    //Large or small cell?
-    if ([self shouldBeLargeImage:indexPath]) {
-        cellIdentifier = @"largeImageCell";
-        imageIdentifier = @"stdImage";
-        imageURL = @"standardURL";
-        size = standard;
-    }
+    CollectionViewCell * cell =
+    [self.collectionView dequeueReusableCellWithReuseIdentifier:[self cellIdentifierForSize:size]
+                                                   forIndexPath:indexPath];
     
-    CollectionViewCell * cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:cellIdentifier
-                                                                                 forIndexPath:indexPath];
-    
-    NSManagedObject * imageInfo = [self.fetchedResultsController objectAtIndexPath:indexPath];
-    
-    NSManagedObject * rawImageDataObject = [imageInfo valueForKey:imageIdentifier];
-    
-    NSData * rawImageData = [rawImageDataObject valueForKey:@"imageBinaryData"];
-    
-    if ([rawImageData length] > 0) {
-        cell.image.image = [UIImage imageWithData:rawImageData];
+    if (cell) {
+        NSManagedObject * imageInfo = [self.fetchedResultsController objectAtIndexPath:indexPath];
+        
+        NSString * imageID = [imageInfo valueForKey:@"instaID"];
+        
+        cell.imageID = imageID;
+        
+        NSManagedObject * rawImageDataObject = [imageInfo valueForKey:[self imageIdentifierForSize:size]];
+        
+        NSData * rawImageData = [rawImageDataObject valueForKey:@"imageBinaryData"];
+        
+        //Is picture in db?
+        if ([rawImageData length] > 0) {  //Yes!
+            cell.image.image = [UIImage imageWithData:rawImageData];
+        } else {                          //No
+            //Does it have an URL for this size?
+            NSString * imageURLKey = [self imageURL:size];
+            NSString * imageURL = nil;
+            if (imageURLKey) {
+                imageURL = [imageInfo valueForKey:imageURLKey];
+            }
+            if ([imageURL length]) {   //Yes - go get it
+                if ([self.APIController respondsToSelector:@selector(downloadImageAtURL:forImageID:size:onqueue:returnImage:)] &&
+                    [imageID length]) {
+                    [self.APIController downloadImageAtURL:imageURL
+                                                forImageID:imageID
+                                                      size:size
+                                                   onqueue:nil
+                                               returnImage:cell.image];
+                }
+            }
+        }
     }
     return cell;
+}
+
+- (CGSize)collectionView:(UICollectionView *)collectionView
+                  layout:(UICollectionViewLayout *)collectionViewLayout
+  sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
+    //Default - small size
+    CGSize cellSize = CGSizeMake(65, 65);
+    if ([self shouldBeLargeImage:indexPath]) {
+        cellSize = CGSizeMake(120, 120);
+    }
+    return cellSize;
+}
+
+-(void) collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    //get the image info for this cell
+    imageSize size = [self shouldBeLargeImage:indexPath] ? standard : loRes;
+    
+    CollectionViewCell * cell =
+    [self.collectionView dequeueReusableCellWithReuseIdentifier:[self cellIdentifierForSize:size]
+                                                   forIndexPath:indexPath];
+  
+  
+    if ([self.delegate respondsToSelector:@selector(displayDetailImage:)]) {
+        [self.delegate displayDetailImage: cell.image.image];
+    }
+}
+
+
+#pragma mark - Utilities
+
+-(BOOL) shouldBeLargeImage:(NSIndexPath *) indexPath {
+    /* Every third item starting with the first should be large. */
+    return indexPath.row % 3 == 0;
+}
+
+-(NSString *) cellIdentifierForSize:(imageSize) size {
+    NSString * identifier = nil;
+    switch (size) {
+        case standard:
+            identifier = @"largeImageCell";
+            break;
+        case loRes:
+            identifier = @"smallImageCell";
+            break;
+        case thumbnail:
+            identifier = @"";
+            break;
+    }
+    return identifier;
+}
+
+-(NSString *) imageIdentifierForSize:(imageSize) size {
+    NSString * identifier = nil;
+    switch (size) {
+        case standard:
+            identifier = @"stdImage";
+            break;
+        case loRes:
+            identifier = @"smallImage";
+            break;
+        case thumbnail:
+            identifier = @"thumbImage";
+            break;
+    }
+    return identifier;
+}
+
+-(NSString *) imageURL:(imageSize) size {
+    NSString * identifier = nil;
+    switch (size) {
+        case standard:
+            identifier = @"standardURL";
+            break;
+        case loRes:
+            identifier = @"loResURL";
+            break;
+        case thumbnail:
+            identifier = @"thumbURL";
+            break;
+    }
+    return identifier;
 }
 
 @end

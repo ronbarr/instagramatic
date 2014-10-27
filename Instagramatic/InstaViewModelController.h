@@ -6,8 +6,11 @@
 //  Copyright (c) 2014 Ron Barr. All rights reserved.
 //
 
+#import "InstaViewModelControllerDelegate.h"
+
 @interface InstaViewModelController : NSObject <UICollectionViewDelegate, UICollectionViewDataSource,NSFetchedResultsControllerDelegate>
 
 @property (strong, nonatomic) UICollectionView * collectionView;
+@property (strong, nonatomic) id <InstaViewModelControllerDelegate> delegate;
 
 @end

@@ -16,8 +16,15 @@ typedef NS_ENUM(NSInteger, imageSize) {
     thumbnail
 };
 
++ (instancetype)sharedController;
+
 -(void)downloadImageAtURL:(NSString *)imageURLString
                forImageID:(NSString *)imageID
-                     size:(imageSize)size;
+                     size:(imageSize)size
+                  onqueue:(NSOperationQueue *) optionalQueue
+              returnImage:(UIImageView *) optionalReturnImageView;
+
+-(NSManagedObject *) imageFromID:(NSString *) imageID
+                       inContext:(NSManagedObjectContext *) context;
 
 @end
