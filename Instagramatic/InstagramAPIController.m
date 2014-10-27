@@ -64,15 +64,15 @@
         self.accessToken = @"87b8196ae610451b98d8c0816634cd0e";
         self.secret = @"6f17e1ac069a4abdad2f131fbb0bfa2f";
         self.delayBetweenRetrievals = 20;
-        self.photoCacheSize = 100;
-        [self pruneDataBase:120];
-         
+        self.photoCacheSize = 150;
+        [self pruneDataBase:self.photoCacheSize];
+        
         //Update frequently
         self.fetchTimer = [NSTimer scheduledTimerWithTimeInterval:self.delayBetweenRetrievals
-                                                  target:self
-                                                selector:@selector(fetchMorePhotos)
-                                                userInfo:nil
-                                                 repeats:YES];
+                                                           target:self
+                                                         selector:@selector(fetchMorePhotos)
+                                                         userInfo:nil
+                                                          repeats:YES];
         [self.fetchTimer fire];
         self.backgroundReadingQueue = [[NSOperationQueue alloc] init];
         self.backgroundReadingQueue.maxConcurrentOperationCount = 1;
@@ -119,9 +119,9 @@
     NSError *error;
     NSArray *array = [context executeFetchRequest:request error:&error];
     if (array.count > maxImages) {
-        NSSortDescriptor * descriptor = [NSSortDescriptor sortDescriptorWithKey:@"updated" ascending:YES];
-        array = [array sortedArrayUsingDescriptors:@[descriptor]];
-        array = [array subarrayWithRange:NSMakeRange(0, array.count - maxImages)];
+        NSSortDescriptor * sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"likes" ascending:NO];
+        array = [array sortedArrayUsingDescriptors:@[sortDescriptor]];
+      array = [array subarrayWithRange:NSMakeRange(0, array.count - maxImages)];
         for (NSManagedObject * image in array) {
             [context deleteObject:image];
         }
@@ -144,7 +144,7 @@
         }
         else {
             [self storeJSONRecords:JSONData inContext:localContext];
-    
+            
             [coreDataManager saveContext:localContext];
         }
         
@@ -179,6 +179,15 @@
     NSArray *array = [context executeFetchRequest:request error:&error];
     if (array.count) {
         fetchedObject = [array firstObject];
+    } else {
+        [request setPredicate:nil];
+        
+        //If we over the max, pick a random image and replace instead...
+        array = [context executeFetchRequest:request error:&error];
+        if (array.count > self.photoCacheSize * 2) {
+            NSInteger randomImage = arc4random_uniform(array.count-1);
+            fetchedObject = array[randomImage];
+        }
     }
     return fetchedObject;
 }
@@ -249,6 +258,12 @@
     [self updateAttribute:@"userName" ofImage:imageInfo withValue:[userInfo objectForKey:@"username"]];
     [self updateAttribute:@"fullName" ofImage:imageInfo withValue:[userInfo objectForKey:@"full)name"]];
     [self updateAttribute:@"userID" ofImage:imageInfo withValue:[userInfo objectForKey:@"id"]];
+    NSDictionary * likes = [imageValues objectForKey:@"likes"];
+    NSNumber * likeCountNumber = [likes objectForKey:@"count"];
+    
+    if (likeCountNumber) {
+        [self updateAttribute:@"likes" ofImage:imageInfo withValue:likeCountNumber];
+    }
     
 }
 
@@ -280,31 +295,35 @@
                                            NSManagedObject * imageInfo = [self imageFromID:imageID
                                                                                  inContext:localContext];
                                            
-                                           NSManagedObject * imagedata = [NSEntityDescription insertNewObjectForEntityForName:@"ImageData"
-                                                                                                       inManagedObjectContext:localContext];
-                                          [imagedata setValue:data forKey:@"imageBinaryData"];
-                                           
-                                           NSString * key = @"stdImage";
-                                           if (size == loRes) {
-                                               key = @"smallImage";
+                                           if ([imageID isEqualToString:[imageInfo valueForKey:@"instaID"]]) {
+                                               NSManagedObject * imagedata = [NSEntityDescription insertNewObjectForEntityForName:@"ImageData"
+                                                            inManagedObjectContext:localContext];
+                                               [imagedata setValue:data forKey:@"imageBinaryData"];
+                                               
+                                               NSString * key = @"stdImage";
+                                               if (size == loRes) {
+                                                   key = @"smallImage";
+                                               }
+                                               else if (size == thumbnail) {
+                                                   key = @"thumbImage";
+                                               }
+                                               [imageInfo setValue:[NSDate date] forKey:@"updated"];
+                                               [imageInfo setValue:imagedata forKey:key];
+                                               
+                                               if (optionalReturnImageView) {
+                                                   [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                                                       optionalReturnImageView.image = [UIImage imageWithData:data];
+                                                    }];
+                                               }
+                                               
+                                               
+                                               [coreDataManager saveContext:localContext];
                                            }
-                                           else if (size == thumbnail) {
-                                               key = @"thumbImage";
-                                           }
-                                           [imageInfo setValue:[NSDate date] forKey:@"updated"];
-                                           [imageInfo setValue:imagedata forKey:key];
-                                           
-                                           if (optionalReturnImageView) {
-                                               optionalReturnImageView.image = [UIImage imageWithData:data];
-                                           }
-                                           
-                      
-                                           [coreDataManager saveContext:localContext];
                                        }];
                                        
                                        //Fire it up
                                        [self.backgroundReadingQueue addOperation:transformImageOperation];
-      
+                                       
                                        
                                    }
                                }];

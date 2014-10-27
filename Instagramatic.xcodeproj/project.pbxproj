@@ -98,8 +98,8 @@
 				02B6394B19FE1E59001EF0FD /* InstaViewModelControllerDelegate.h */,
 				023B411F19FC977700972BE3 /* InstagramAPIController.h */,
 				023B412019FC977700972BE3 /* InstagramAPIController.m */,
-				02BF9B5219FC85CF00523C71 /* InstaViewModelController.m */,
 				02BF9B5119FC85CF00523C71 /* InstaViewModelController.h */,
+				02BF9B5219FC85CF00523C71 /* InstaViewModelController.m */,
 			);
 			name = Instagram;
 			sourceTree = "<group>";
