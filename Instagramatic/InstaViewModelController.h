@@ -11,6 +11,7 @@
 @interface InstaViewModelController : NSObject <UICollectionViewDelegate, UICollectionViewDataSource,NSFetchedResultsControllerDelegate>
 
 @property (strong, nonatomic) UICollectionView * collectionView;
+@property (strong, nonatomic) UIView * hostView;
 @property (strong, nonatomic) id <InstaViewModelControllerDelegate> delegate;
 
 @end

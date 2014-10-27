@@ -25,10 +25,11 @@
     self.modelController = [[InstaViewModelController alloc] init];
     self.modelController.collectionView = self.collectionView;
     self.modelController.delegate = self;
+    self.modelController.hostView = self.view;
     
     self.collectionView.delegate = self.modelController;
     self.collectionView.dataSource = self.modelController;
-    
+
  }
 
 -(void) viewDidAppear:(BOOL)animated {

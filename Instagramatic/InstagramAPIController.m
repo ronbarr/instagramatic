@@ -67,13 +67,9 @@
         self.photoCacheSize = 150;
         [self pruneDataBase:self.photoCacheSize];
         
-        //Update frequently
-        self.fetchTimer = [NSTimer scheduledTimerWithTimeInterval:self.delayBetweenRetrievals
-                                                           target:self
-                                                         selector:@selector(fetchMorePhotos)
-                                                         userInfo:nil
-                                                          repeats:YES];
-        [self.fetchTimer fire];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(fetchMorePhotos)
+                                                     name:@"fetchPhotos" object:nil ] ;
         self.backgroundReadingQueue = [[NSOperationQueue alloc] init];
         self.backgroundReadingQueue.maxConcurrentOperationCount = 1;
     }

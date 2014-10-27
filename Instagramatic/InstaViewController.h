@@ -10,6 +10,6 @@
 #import "InstaViewModelControllerDelegate.h"
 
 @interface InstaViewController : UICollectionViewController <InstaViewModelControllerDelegate,
-                                                                UIPopoverControllerDelegate>
+                                                            UIScrollViewDelegate>
 
 @end

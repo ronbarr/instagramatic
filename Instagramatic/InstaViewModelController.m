@@ -70,7 +70,7 @@
     
     // Set the sort key
     
-    NSSortDescriptor * sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"created"
+    NSSortDescriptor * sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"updated"
                                                                       ascending:YES];
     
     [fetchRequest setSortDescriptors:@[sortDescriptor]];
@@ -244,5 +244,13 @@
     }
     return identifier;
 }
+
+#pragma mark - scrollview delegate
+-(void)scrollViewDidScroll:(UIScrollView *)scrollView{
+    
+    if(self.collectionView.contentOffset.y >= self.collectionView.contentSize.height - CGRectGetHeight(self.hostView.bounds) - CGRectGetHeight(self.hostView.bounds)/2){
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"fetchPhotos" object:nil];    }
+}
+
 
 @end
