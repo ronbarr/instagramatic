@@ -66,6 +66,7 @@
         self.delayBetweenRetrievals = 20;
         self.photoCacheSize = 150;
         [self pruneDataBase:self.photoCacheSize];
+        [self fetchMorePhotos];
         
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(fetchMorePhotos)
@@ -115,7 +116,7 @@
     NSError *error;
     NSArray *array = [context executeFetchRequest:request error:&error];
     if (array.count > maxImages) {
-        NSSortDescriptor * sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"likes" ascending:NO];
+        NSSortDescriptor * sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"updated" ascending:YES];
         array = [array sortedArrayUsingDescriptors:@[sortDescriptor]];
       array = [array subarrayWithRange:NSMakeRange(0, array.count - maxImages)];
         for (NSManagedObject * image in array) {
@@ -178,11 +179,12 @@
     } else {
         [request setPredicate:nil];
         
-        //If we over the max, pick a random image and replace instead...
+        //If we over the max, pick the first image and replace instead...
         array = [context executeFetchRequest:request error:&error];
         if (array.count > self.photoCacheSize * 2) {
-            NSInteger randomImage = arc4random_uniform(array.count-1);
-            fetchedObject = array[randomImage];
+            NSSortDescriptor * sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"updated" ascending:YES];
+            array = [array sortedArrayUsingDescriptors:@[sortDescriptor]];
+            fetchedObject = [array firstObject];
         }
     }
     return fetchedObject;
