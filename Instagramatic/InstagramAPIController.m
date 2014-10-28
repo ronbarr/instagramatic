@@ -116,7 +116,7 @@
     NSError *error;
     NSArray *array = [context executeFetchRequest:request error:&error];
     if (array.count > maxImages) {
-        NSSortDescriptor * sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"updated" ascending:YES];
+        NSSortDescriptor * sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"created" ascending:YES];
         array = [array sortedArrayUsingDescriptors:@[sortDescriptor]];
       array = [array subarrayWithRange:NSMakeRange(0, array.count - maxImages)];
         for (NSManagedObject * image in array) {
@@ -176,16 +176,6 @@
     NSArray *array = [context executeFetchRequest:request error:&error];
     if (array.count) {
         fetchedObject = [array firstObject];
-    } else {
-        [request setPredicate:nil];
-        
-        //If we over the max, pick the first image and replace instead...
-        array = [context executeFetchRequest:request error:&error];
-        if (array.count > self.photoCacheSize * 2) {
-            NSSortDescriptor * sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"updated" ascending:YES];
-            array = [array sortedArrayUsingDescriptors:@[sortDescriptor]];
-            fetchedObject = [array firstObject];
-        }
     }
     return fetchedObject;
 }

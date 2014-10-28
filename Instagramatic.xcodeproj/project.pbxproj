@@ -14,6 +14,7 @@
 		023B412F19FCF05100972BE3 /* CollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 023B412E19FCF05100972BE3 /* CollectionViewCell.m */; };
 		02B6394E19FE208F001EF0FD /* DetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 02B6394D19FE208F001EF0FD /* DetailViewController.m */; };
 		02BF9B5319FC85CF00523C71 /* InstaViewModelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 02BF9B5219FC85CF00523C71 /* InstaViewModelController.m */; };
+		02C07C591A002A7200F81801 /* grayFemale.png in Resources */ = {isa = PBXBuildFile; fileRef = 02C07C581A002A7200F81801 /* grayFemale.png */; };
 		02EA0C1D19FC7FCA00C773A8 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 02EA0C1C19FC7FCA00C773A8 /* main.m */; };
 		02EA0C2019FC7FCA00C773A8 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 02EA0C1F19FC7FCA00C773A8 /* AppDelegate.m */; };
 		02EA0C2319FC7FCA00C773A8 /* Instagramatic.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 02EA0C2119FC7FCA00C773A8 /* Instagramatic.xcdatamodeld */; };
@@ -49,6 +50,7 @@
 		02BF9B5119FC85CF00523C71 /* InstaViewModelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InstaViewModelController.h; sourceTree = "<group>"; };
 		02BF9B5219FC85CF00523C71 /* InstaViewModelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InstaViewModelController.m; sourceTree = "<group>"; };
 		02BF9B5419FC861C00523C71 /* Instaview.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Instaview.pch; sourceTree = "<group>"; };
+		02C07C581A002A7200F81801 /* grayFemale.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = grayFemale.png; sourceTree = "<group>"; };
 		02EA0C1719FC7FCA00C773A8 /* Instagramatic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Instagramatic.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		02EA0C1B19FC7FCA00C773A8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		02EA0C1C19FC7FCA00C773A8 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -145,6 +147,7 @@
 		02EA0C1A19FC7FCA00C773A8 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				02C07C581A002A7200F81801 /* grayFemale.png */,
 				02EA0C2C19FC7FCA00C773A8 /* LaunchScreen.xib */,
 				02BF9B5419FC861C00523C71 /* Instaview.pch */,
 				023B411A19FC88FA00972BE3 /* .gitignore */,
@@ -252,6 +255,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				02C07C591A002A7200F81801 /* grayFemale.png in Resources */,
 				023B411B19FC88FA00972BE3 /* .gitignore in Resources */,
 				023B412319FCA69600972BE3 /* MainStoryboard.storyboard in Resources */,
 				02EA0C2E19FC7FCA00C773A8 /* LaunchScreen.xib in Resources */,

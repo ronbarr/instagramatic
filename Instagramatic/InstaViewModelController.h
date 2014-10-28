@@ -8,6 +8,11 @@
 
 #import "InstaViewModelControllerDelegate.h"
 
+
+/* Manages the flow of Instagram data to the UICollection View.
+ Delegate/Datasource for Collection View */
+
+
 @interface InstaViewModelController : NSObject <UICollectionViewDelegate, UICollectionViewDataSource,NSFetchedResultsControllerDelegate>
 
 @property (strong, nonatomic) UICollectionView * collectionView;

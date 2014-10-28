@@ -21,6 +21,9 @@
 //Changed objects
 @property (strong, nonatomic) NSMutableArray *objectChanges;
 
+//Default Image
+@property (strong, nonatomic) UIImage *defaultImage;
+
 @end
 
 @implementation InstaViewModelController
@@ -43,6 +46,7 @@
             }
         }];
         _objectChanges = [NSMutableArray arrayWithCapacity:100];
+        _defaultImage = [UIImage imageNamed:@"grayFemale"];
         
     }
     return self;
@@ -70,7 +74,7 @@
     
     // Set the sort key
     
-    NSSortDescriptor * sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"updated"
+    NSSortDescriptor * sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"created"
                                                                       ascending:YES];
     
     [fetchRequest setSortDescriptors:@[sortDescriptor]];
@@ -131,6 +135,8 @@
     [self.collectionView dequeueReusableCellWithReuseIdentifier:[self cellIdentifierForSize:size]
                                                    forIndexPath:indexPath];
     
+    cell.image.image = _defaultImage;
+    
     if (cell) {
         NSManagedObject * imageInfo = [self.fetchedResultsController objectAtIndexPath:indexPath];
         
@@ -147,7 +153,7 @@
             cell.image.image = [UIImage imageWithData:rawImageData];
         } else {                          //No
             //Does it have an URL for this size?
-            cell.image.image = [UIImage imageNamed:@"grayFemale"];
+
             NSString * imageURLKey = [self imageURL:size];
             NSString * imageURL = nil;
             if (imageURLKey) {
@@ -246,7 +252,7 @@
 }
 
 #pragma mark - scrollview delegate
--(void)scrollViewDidScroll:(UIScrollView *)scrollView{
+-(void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView {
     
     if(self.collectionView.contentOffset.y >= self.collectionView.contentSize.height - CGRectGetHeight(self.hostView.bounds) - CGRectGetHeight(self.hostView.bounds)/2){
         [[NSNotificationCenter defaultCenter] postNotificationName:@"fetchPhotos" object:nil];    }
