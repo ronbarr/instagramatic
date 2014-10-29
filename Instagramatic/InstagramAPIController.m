@@ -40,6 +40,7 @@
 
 //Incoming data
 @property (strong,nonatomic) NSMutableData * incomingData;
+@property (assign,nonatomic) NSInteger loadedCount;
 
 @end
 
@@ -64,7 +65,7 @@
         self.accessToken = @"87b8196ae610451b98d8c0816634cd0e";
         self.secret = @"6f17e1ac069a4abdad2f131fbb0bfa2f";
         self.delayBetweenRetrievals = 20;
-        self.photoCacheSize = 150;
+        self.photoCacheSize = 100;
         [self pruneDataBase:self.photoCacheSize];
         [self fetchMorePhotos];
         
@@ -96,13 +97,15 @@
         [self.imageInfoConnection cancel];
         self.imageInfoConnection = nil;
     }
-    self.imageInfoConnection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+    
     self.incomingData = [NSMutableData data];
+    self.imageInfoConnection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+    [self.imageInfoConnection start];
+    
 }
 
 -(void) fetchMorePhotos {
     [self retrievePhotos:self.tag sinceID:[self.lastID longLongValue]];
-    NSLog(@"refreshing...");
 }
 
 -(void) pruneDataBase:(NSInteger) maxImages {
@@ -123,6 +126,7 @@
             [context deleteObject:image];
         }
         [[CoreDataManager sharedManager] saveContext:context];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"reloadCollection" object:nil];
     }
 }
 
@@ -137,14 +141,13 @@
         NSError * error;
         NSDictionary * JSONData = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
         if (error) {
-            NSLog(@"fatal error %@ %lu", error, (long)error.code);
+            //NSLog(@"fatal error %@ %lu", error, (long)error.code);
         }
         else {
             [self storeJSONRecords:JSONData inContext:localContext];
-            
             [coreDataManager saveContext:localContext];
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"reloadCollection" object:nil];
         }
-        
     }];
 }
 
@@ -156,6 +159,14 @@
         [self storeRecord:imageValues inContext:context];
     }
     
+    _loadedCount += data.count;
+
+    if( _loadedCount < 20){
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"fetchPhotos" object:nil];
+    }
+    else{
+        _loadedCount = 0;
+    }
 }
 
 #pragma mark fetch an image data object with an ID
@@ -252,7 +263,6 @@
     if (likeCountNumber) {
         [self updateAttribute:@"likes" ofImage:imageInfo withValue:likeCountNumber];
     }
-    
 }
 
 
@@ -304,15 +314,20 @@
                                                     }];
                                                }
                                                
-                                               
-                                               [coreDataManager saveContext:localContext];
+                                               dispatch_async(dispatch_get_main_queue(), ^{
+                                                   [coreDataManager saveContext:localContext];
+                                               });
                                            }
                                        }];
                                        
                                        //Fire it up
-                                       [self.backgroundReadingQueue addOperation:transformImageOperation];
-                                       
-                                       
+                                       [queue addOperation:transformImageOperation];
+                                       //NSLog(@"%@   %d", queue.description, queue.isSuspended);
+                                      // [self.backgroundReadingQueue addOperation:transformImageOperation];
+                                
+                                    
+                                   }else{
+                                       //NSLog(@"%@", error.description);
                                    }
                                }];
     }
@@ -338,12 +353,12 @@
         NSHTTPURLResponse * restResponse = (NSHTTPURLResponse *) response;
         NSInteger statusCode = restResponse.statusCode;
         if (statusCode >= 200 && statusCode < 300) {
-            NSLog(@"successful request %li", (long)statusCode);
+            //NSLog(@"successful request %li", (long)statusCode);
             
             [self.incomingData setLength:0];
         }
         else {
-            NSLog(@"bad request %li", (long)statusCode);
+           // NSLog(@"bad request %li", (long)statusCode);
         }
     }
 }
@@ -360,6 +375,6 @@
 }
 
 -(void) connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-    NSLog(@"fatal error %@ %lu", error, (long)error.code);
+    //NSLog(@"fatal error %@ %lu", error, (long)error.code);
 }
 @end

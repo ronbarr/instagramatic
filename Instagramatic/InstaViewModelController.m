@@ -18,11 +18,10 @@
 //Manages reading the database to supply images to the UI
 @property (strong, nonatomic) NSFetchedResultsController * fetchedResultsController;
 
-//Changed objects
-@property (strong, nonatomic) NSMutableArray *objectChanges;
-
 //Default Image
 @property (strong, nonatomic) UIImage *defaultImage;
+
+@property (assign, nonatomic) BOOL bGettingImages;
 
 @end
 
@@ -33,11 +32,15 @@
         //Create the API controller and start connection
         self.APIController = [InstagramAPIController sharedController];
         
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(reloadCollectionView)
+                                                     name:@"reloadCollection" object:nil ] ;
+        
         //Initialize the fetched results controller
         [[[self fetchedResultsController] managedObjectContext] performBlock:^{
             NSError *error = nil;
             if (![[self fetchedResultsController] performFetch:&error]){
-                NSLog(@"error fetching %@",error);
+                //NSLog(@"error fetching %@",error);
             } else {
                 // Update the view from the main queue.
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
@@ -45,9 +48,8 @@
                 }];
             }
         }];
-        _objectChanges = [NSMutableArray arrayWithCapacity:100];
-        _defaultImage = [UIImage imageNamed:@"grayFemale"];
         
+        _defaultImage = [UIImage imageNamed:@"grayFemale"];
     }
     return self;
 }
@@ -92,30 +94,11 @@
     
     NSError *error = nil;
     if (![self.fetchedResultsController performFetch:&error]) {
-        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+        //NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
     }
     
     return _fetchedResultsController;
 }
-
-#pragma mark - changes
-- (void)controller:(NSFetchedResultsController *)controller
-   didChangeObject:(id)anObject
-       atIndexPath:(NSIndexPath *)indexPath
-     forChangeType:(NSFetchedResultsChangeType)type
-      newIndexPath:(NSIndexPath *)newIndexPath
-{
-    
-    [_objectChanges addObject:anObject];
-    if (_objectChanges.count >= 20) {
-        [_objectChanges removeAllObjects];
-        self.fetchedResultsController = nil;
-        [self.collectionView reloadData];
-        NSLog(@"reloading...");
-
-    }
-}
-
 
 #pragma mark - Collection View Data Source & delegate
 -(NSInteger) collectionView:(UICollectionView *)collectionView
@@ -153,7 +136,7 @@
             cell.image.image = [UIImage imageWithData:rawImageData];
         } else {                          //No
             //Does it have an URL for this size?
-
+            
             NSString * imageURLKey = [self imageURL:size];
             NSString * imageURL = nil;
             if (imageURLKey) {
@@ -252,11 +235,42 @@
 }
 
 #pragma mark - scrollview delegate
--(void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView {
-    
-    if(self.collectionView.contentOffset.y >= self.collectionView.contentSize.height - CGRectGetHeight(self.hostView.bounds) - CGRectGetHeight(self.hostView.bounds)/2){
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"fetchPhotos" object:nil];    }
+-(void)scrollViewDidScroll:(UIScrollView *)scrollView{
+    if( self.collectionView.contentOffset.y >= self.collectionView.contentSize.height - (self.collectionView.bounds.size.height) && !self.bGettingImages ) {
+        //Toggle buffering boolean and get more images
+        self.bGettingImages = true;
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"fetchPhotos" object:nil];
+    }
 }
 
+-(void)reloadCollectionView{
+    NSManagedObjectContext * context = [[CoreDataManager sharedManager] rootObjectContext];
+    NSEntityDescription *entity;
+    NSSortDescriptor *primarySort;
+    
+    entity = [NSEntityDescription entityForName:@"Image" inManagedObjectContext:context];
+    primarySort = [[NSSortDescriptor alloc]initWithKey:@"created" ascending:YES];
+    
+    NSFetchRequest *newFetchReq = [[NSFetchRequest alloc]init];
+    [newFetchReq setEntity:entity];
+    [newFetchReq setSortDescriptors:[NSArray arrayWithObjects:primarySort, nil]];
+    
+    self.fetchedResultsController = [self.fetchedResultsController initWithFetchRequest:newFetchReq managedObjectContext:context sectionNameKeyPath:nil cacheName:nil];
+    self.fetchedResultsController.delegate = self;
+    
+    NSError *error;
+    
+    if ([self.fetchedResultsController performFetch:&error])
+    {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            _bGettingImages = false;
+            [self.collectionView reloadData];
+        });
+    }
+    else
+    {
+        //NSLog(@"Fetch error: %@",[error localizedDescription]);
+    }
+}
 
 @end

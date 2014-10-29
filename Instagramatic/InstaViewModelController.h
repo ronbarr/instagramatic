@@ -7,7 +7,7 @@
 //
 
 #import "InstaViewModelControllerDelegate.h"
-
+#import "CoreDataManager.h"
 
 /* Manages the flow of Instagram data to the UICollection View.
  Delegate/Datasource for Collection View */

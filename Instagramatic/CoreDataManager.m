@@ -73,7 +73,7 @@
         dict[NSLocalizedFailureReasonErrorKey] = failureReason;
         dict[NSUnderlyingErrorKey] = error;
         error = [NSError errorWithDomain:@"YOUR_ERROR_DOMAIN" code:9999 userInfo:dict];
-        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+        //NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
 
     }
     
@@ -127,17 +127,15 @@
         NSError *error = nil;
          if ([context hasChanges]) {
             if ([context save:&error]) {
-      
                 if (context.parentContext) {
                     [self saveContext:context.parentContext];
                 }
              }
             else {
                 success = NO;
-                NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+                //NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
              }
         }
-    
     }
  }
 

@@ -135,7 +135,6 @@
 				023B412419FCB43900972BE3 /* Core Data */,
 				02B6394C19FE208F001EF0FD /* DetailViewController.h */,
 				02B6394D19FE208F001EF0FD /* DetailViewController.m */,
-				02EA0C2A19FC7FCA00C773A8 /* Images.xcassets */,
 				023B412619FCB46300972BE3 /* Instagram */,
 				02EA0C4319FC813100C773A8 /* InstaViewController.h */,
 				02EA0C4419FC813100C773A8 /* InstaViewController.m */,
@@ -147,6 +146,7 @@
 		02EA0C1A19FC7FCA00C773A8 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				02EA0C2A19FC7FCA00C773A8 /* Images.xcassets */,
 				02C07C581A002A7200F81801 /* grayFemale.png */,
 				02EA0C2C19FC7FCA00C773A8 /* LaunchScreen.xib */,
 				02BF9B5419FC861C00523C71 /* Instaview.pch */,
@@ -404,6 +404,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_PREFIX_HEADER = Instagramatic/Instaview.pch;
 				INFOPLIST_FILE = Instagramatic/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -416,6 +417,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_PREFIX_HEADER = Instagramatic/Instaview.pch;
 				INFOPLIST_FILE = Instagramatic/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
